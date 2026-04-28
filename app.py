@@ -1,7 +1,7 @@
 import streamlit as st
 
 # --- SAYFA AYARLARI ---
-st.set_page_config(page_title="Animalya Veteriner AI", page_icon="🐾")
+st.set_page_config(page_title="nıko veterıner yardım asıstanı", page_icon="🐾")
 
 # --- ÖZEL STİL (CSS) ---
 st.markdown("""
