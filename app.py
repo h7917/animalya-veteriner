@@ -1,72 +1,80 @@
 import streamlit as st
 
-# --- SAYFA AYARLARI VE TASARIM ---
-st.set_page_config(page_title="Nazilli Animalya AI", page_icon="🐾", layout="centered")
+# --- SAYFA AYARLARI ---
+st.set_page_config(page_title="Animalya Veteriner AI", page_icon="🐾")
 
-# Burası uygulamayı renklendiren "Sihirli" kısım (CSS)
+# --- ÖZEL STİL (CSS) ---
 st.markdown("""
     <style>
-    .stApp { background-color: #f8f9fa; }
-    .main-title { color: #d32f2f; text-align: center; font-size: 40px; font-weight: bold; text-shadow: 2px 2px 4px #ccc; }
-    .stButton>button { background-color: #d32f2f; color: white; border-radius: 20px; height: 3em; width: 100%; font-weight: bold; border: none; }
-    .stButton>button:hover { background-color: #b71c1c; color: white; border: none; }
-    .report-card { background: white; padding: 20px; border-radius: 15px; border-left: 10px solid #d32f2f; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+    .main { background-color: #f8f9fa; }
+    .stButton>button { width: 100%; background-color: #d32f2f; color: white; height: 3em; border-radius: 10px; font-weight: bold; }
+    .recete-kutusu { border: 2px solid #1976d2; padding: 20px; border-radius: 15px; background-color: white; box-shadow: 2px 2px 10px rgba(0,0,0,0.1); }
     </style>
     """, unsafe_allow_html=True)
 
-# --- BAŞLIK ---
-st.markdown('<p class="main-title">🐾 NAZİLLİ ANİMALYA VETERİNER</p>', unsafe_allow_html=True)
-st.write("<p style='text-align: center; color: gray;'>Yapay Zeka Destekli Klinik Karar Sistemi</p>", unsafe_allow_html=True)
-
-# --- VERİTABANI ---
-DB = {
-    'Kedi': {'ates': (38.0, 39.2), 'doz': 0.1, 'ilac': 'Meloksikam', 'ikon': '🐱'},
-    'Köpek': {'ates': (37.5, 39.2), 'doz': 4.0, 'ilac': 'Karprofen', 'ikon': '🐶'},
-    'Tavşan': {'ates': (38.5, 40.0), 'doz': 0.03, 'ilac': 'Buprenorfin', 'ikon': '🐰'}
+# --- VERİTABANI (İlaç Detayları Eklendi) ---
+# Dozajlar ve uygulama şekilleri örnektir, hekim onayı gerekir.
+VERI = {
+    'Kedi': {
+        'ilac': 'Meloksikam (Ağrı Kesici)',
+        'doz_oran': 0.1, 
+        'form': '💉 Enjeksiyon (Deri Altı)', 
+        'periyot': 'Günde 1 Kez',
+        'ates_ref': (38.0, 39.2)
+    },
+    'Köpek': {
+        'ilac': 'Karprofen (Antienflamatuar)',
+        'doz_oran': 4.0, 
+        'form': '💊 Tablet (Ağızdan)', 
+        'periyot': '12 Saatte Bir',
+        'ates_ref': (37.5, 39.2)
+    },
+    'Tavşan': {
+        'ilac': 'Enrofloksasin (Antibiyotik)',
+        'doz_oran': 5.0, 
+        'form': '💧 Oral Süspansiyon', 
+        'periyot': 'Günde 2 Kez',
+        'ates_ref': (38.5, 40.0)
+    }
 }
 
-# --- SEKMELER ---
-tab1, tab2 = st.tabs(["📋 Klinik Muayene", "🔬 Laboratuvar Analizi"])
+# --- ARAYÜZ ---
+st.markdown("<h1 style='text-align: center; color: #d32f2f;'>🐾 ANİMALYA VETERİNER AI</h1>", unsafe_allow_html=True)
+st.write("---")
 
-with tab1:
-    col1, col2 = st.columns(2)
-    with col1:
-        isim = st.text_input("Hasta Adı", placeholder="Örn: Pamuk")
-        tur = st.selectbox("Tür", list(DB.keys()))
-    with col2:
-        kilo = st.number_input("Kilo (kg)", min_value=0.1, value=5.0)
-        ates = st.slider("Ateş (°C)", 34.0, 44.0, 38.5)
+col1, col2 = st.columns(2)
+with col1:
+    isim = st.text_input("Hasta Adı", "Pamuk")
+    tur = st.selectbox("Tür", list(VERI.keys()))
+with col2:
+    kilo = st.number_input("Kilo (kg)", min_value=0.1, value=5.0, step=0.1)
+    ates = st.number_input("Ateş (°C)", value=38.5, step=0.1)
 
-    if st.button("ANALİZ RAPORU OLUŞTUR"):
-        data = DB[tur]
-        doz = round(kilo * data['doz'], 2)
-        durum = "STABİL" if data['ates'][0] <= ates <= data['ates'][1] else "KRİTİK"
-        renk = "green" if durum == "STABİL" else "red"
+if st.button("TIBBİ ANALİZİ BAŞLAT"):
+    secilen = VERI[tur]
+    toplam_doz = round(kilo * secilen['doz_oran'], 2)
+    
+    # Ateş Kontrolü
+    durum = "STABİL" if secilen['ates_ref'][0] <= ates <= secilen['ates_ref'][1] else "KRİTİK"
+    renk = "#2e7d32" if durum == "STABİL" else "#d32f2f"
 
-        # Zenginleştirilmiş Sonuç Kartı
-        st.markdown(f"""
-            <div class="report-card">
-                <h2 style="color:{renk};">{data['ikon']} {isim.upper()} - {durum}</h2>
-                <hr>
-                <p><b>🩺 Önerilen İlaç:</b> {data['ilac']}</p>
-                <p><b>⚖️ Hesaplanan Dozaj:</b> <span style="font-size: 20px; color: #d32f2f;">{doz} mg</span></p>
-                <p><b>🌡️ Ölçülen Isı:</b> {ates} °C</p>
-            </div>
-        """, unsafe_allow_html=True)
-        
-        # WhatsApp İçin Hızlı Kopyala
-        st.info(f"📲 **WhatsApp Mesajı:** *NAZİLLİ ANİMALYA* - {isim}: Durum {durum}, Doz: {doz}mg.")
+    # --- REÇETE EKRANI ---
+    st.markdown(f"""
+    <div class="recete-kutusu">
+        <h2 style="color: {renk}; text-align: center; margin-top:0;">{tur.upper()}: {isim.upper()} - {durum}</h2>
+        <hr>
+        <table style="width:100%; font-size: 18px;">
+            <tr><td><b>💊 Kullanılacak İlaç:</b></td><td>{secilen['ilac']}</td></tr>
+            <tr><td><b>⚖️ Hesaplanan Doz:</b></td><td><span style="color:red; font-weight:bold;">{toplam_doz} mg</span></td></tr>
+            <tr><td><b>💉 Uygulama Şekli:</b></td><td>{secilen['form']}</td></tr>
+            <tr><td><b>⏰ Kullanım Sıklığı:</b></td><td>{secilen['periyot']}</td></tr>
+        </table>
+        <br>
+        <div style="background-color: #fff3e0; padding: 10px; border-radius: 8px; border-left: 5px solid #ff9800;">
+            <b>📱 WhatsApp Paylaşım Notu:</b><br>
+            *ANİMALYA* - {isim} ({tur}): Ateş {ates}°C. {secilen['ilac']} uygulandı ({toplam_doz}mg, {secilen['form']}).
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
-with tab2:
-    st.write("### 🔬 Laboratuvar Değerlendirmesi")
-    wbc = st.number_input("WBC (Beyaz Kan Hücresi)", 0.0, 50.0, 10.0)
-    if st.button("Tahlili Yorumla"):
-        if wbc > 17.0:
-            st.error("⚠️ Yüksek WBC: Enfeksiyon veya yangı belirtisi olabilir.")
-        elif wbc < 6.0:
-            st.warning("⚠️ Düşük WBC: Bağışıklık sistemi baskılanmış olabilir.")
-        else:
-            st.success("✅ WBC Değeri Normal sınırlarda.")
-
-st.divider()
-st.caption("Nazilli Lise GFB Üyesi tarafından Animalya için geliştirilmiştir. 2026")
+st.caption("Nazilli Animalya Veteriner Kliniği Karar Destek Sistemi v5.0")
