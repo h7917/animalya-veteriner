@@ -1,19 +1,18 @@
 import streamlit as st
 
 # --- SAYFA AYARLARI ---
-st.set_page_config(page_title="nıko veterıner yardım asıstanı", page_icon="🐾")
+st.set_page_config(page_title="Niko Asistan Vet", page_icon="🐾")
 
 # --- ÖZEL STİL (CSS) ---
 st.markdown("""
     <style>
     .main { background-color: #f8f9fa; }
-    .stButton>button { width: 100%; background-color: #d32f2f; color: white; height: 3em; border-radius: 10px; font-weight: bold; }
+    .stButton>button { width: 100%; background-color: #1976d2; color: white; height: 3em; border-radius: 10px; font-weight: bold; }
     .recete-kutusu { border: 2px solid #1976d2; padding: 20px; border-radius: 15px; background-color: white; box-shadow: 2px 2px 10px rgba(0,0,0,0.1); }
     </style>
     """, unsafe_allow_html=True)
 
-# --- VERİTABANI (İlaç Detayları Eklendi) ---
-# Dozajlar ve uygulama şekilleri örnektir, hekim onayı gerekir.
+# --- VERİTABANI ---
 VERI = {
     'Kedi': {
         'ilac': 'Meloksikam (Ağrı Kesici)',
@@ -38,8 +37,9 @@ VERI = {
     }
 }
 
-# --- ARAYÜZ ---
-st.markdown("<h1 style='text-align: center; color: #d32f2f;'>🐾 ANİMALYA VETERİNER AI</h1>", unsafe_allow_html=True)
+# --- ARAYÜZ (YENİ İSİM) ---
+st.markdown("<h1 style='text-align: center; color: #1976d2;'>🐾 YARDIMCI NİKO ASİSTAN VET</h1>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; color: #555;'>Akıllı Klinik Karar Destek Sistemi</p>", unsafe_allow_html=True)
 st.write("---")
 
 col1, col2 = st.columns(2)
@@ -50,7 +50,7 @@ with col2:
     kilo = st.number_input("Kilo (kg)", min_value=0.1, value=5.0, step=0.1)
     ates = st.number_input("Ateş (°C)", value=38.5, step=0.1)
 
-if st.button("TIBBİ ANALİZİ BAŞLAT"):
+if st.button("ANALİZİ BAŞLAT"):
     secilen = VERI[tur]
     toplam_doz = round(kilo * secilen['doz_oran'], 2)
     
@@ -64,17 +64,17 @@ if st.button("TIBBİ ANALİZİ BAŞLAT"):
         <h2 style="color: {renk}; text-align: center; margin-top:0;">{tur.upper()}: {isim.upper()} - {durum}</h2>
         <hr>
         <table style="width:100%; font-size: 18px;">
-            <tr><td><b>💊 Kullanılacak İlaç:</b></td><td>{secilen['ilac']}</td></tr>
+            <tr><td><b>🤖 Asistan Notu:</b></td><td>{secilen['ilac']} önerilir.</td></tr>
             <tr><td><b>⚖️ Hesaplanan Doz:</b></td><td><span style="color:red; font-weight:bold;">{toplam_doz} mg</span></td></tr>
             <tr><td><b>💉 Uygulama Şekli:</b></td><td>{secilen['form']}</td></tr>
             <tr><td><b>⏰ Kullanım Sıklığı:</b></td><td>{secilen['periyot']}</td></tr>
         </table>
         <br>
-        <div style="background-color: #fff3e0; padding: 10px; border-radius: 8px; border-left: 5px solid #ff9800;">
-            <b>📱 WhatsApp Paylaşım Notu:</b><br>
-            *ANİMALYA* - {isim} ({tur}): Ateş {ates}°C. {secilen['ilac']} uygulandı ({toplam_doz}mg, {secilen['form']}).
+        <div style="background-color: #e3f2fd; padding: 10px; border-radius: 8px; border-left: 5px solid #1976d2;">
+            <b>📱 Niko Paylaşım Notu:</b><br>
+            *NİKO ASİSTAN* - {isim} ({tur}): Ateş {ates}°C. {secilen['ilac']} ({toplam_doz}mg, {secilen['form']}) uygun görüldü.
         </div>
     </div>
     """, unsafe_allow_html=True)
 
-st.caption("Nazilli Animalya Veteriner Kliniği Karar Destek Sistemi v5.0")
+st.caption("Nazilli Teknik Destek: Niko Asistan Vet v6.0")
